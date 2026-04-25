@@ -16,15 +16,17 @@ export function MoodCard({
 
   return (
     <Card title="Adjust Mood" icon={Smile}>
-      <div className="flex flex-wrap gap-1.5 mb-4">
+      {/* Chip grid — min 44px height per chip for touch accessibility */}
+      <div className="flex flex-wrap gap-2 mb-4">
         {[...MOODS, 'Custom'].map((mood) => (
           <button
             key={mood}
             onClick={() => setState((s: any) => ({ ...s, selectedMood: mood }))}
             disabled={disabled}
+            aria-pressed={activeMood === mood}
             className={`
-              px-3 py-2 rounded-lg text-xs font-semibold border transition-all
-              min-h-[36px] disabled:opacity-40 disabled:pointer-events-none
+              px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all
+              min-h-[44px] disabled:opacity-40 disabled:pointer-events-none
               ${activeMood === mood
                 ? 'bg-accent-subtle border-accent text-accent'
                 : 'bg-surface-2 border-border text-ink-2 hover:border-accent hover:text-accent hover:bg-accent-subtle'
@@ -42,6 +44,7 @@ export function MoodCard({
           value={state.customMood}
           onChange={(e) => setState((s: any) => ({ ...s, customMood: e.target.value }))}
           placeholder="Describe a mood…"
+          aria-label="Custom mood description"
           className="
             w-full p-3 mb-4 text-sm bg-surface-2 border border-border rounded-xl
             outline-none focus:border-accent focus:ring-2 focus:ring-accent/20
@@ -61,6 +64,12 @@ export function MoodCard({
       >
         Apply Mood
       </button>
+
+      {!state.characterBase64 && (
+        <p className="mt-3 text-xs text-ink-3 text-center">
+          Generate a character first to enable mood adjustments.
+        </p>
+      )}
     </Card>
   );
 }

@@ -138,8 +138,9 @@ export function StyleCard({
                 <button
                   key={t.value}
                   onClick={() => setState((s: any) => ({ ...s, tone: t.value }))}
+                  aria-pressed={state.tone === t.value}
                   className={`
-                    px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all
+                    px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all min-h-[36px]
                     ${state.tone === t.value
                       ? 'bg-ink text-surface'
                       : 'bg-surface-2 text-ink-2 hover:bg-surface-3'
@@ -186,8 +187,10 @@ export function StyleCard({
                     <button
                       key={t}
                       onClick={() => set({ textTransform: t })}
+                      aria-label={`Text transform: ${t}`}
+                      aria-pressed={state.textStyle.textTransform === t}
                       className={`
-                        flex-1 py-1.5 rounded text-xs font-bold transition-all
+                        flex-1 py-2 rounded text-xs font-bold transition-all min-h-[36px]
                         ${state.textStyle.textTransform === t
                           ? 'bg-surface text-accent shadow-sm'
                           : 'text-ink-3 hover:text-ink'
@@ -258,8 +261,9 @@ export function StyleCard({
                       key={align}
                       onClick={() => set({ textAlign: align })}
                       aria-label={`Align ${align}`}
+                      aria-pressed={state.textStyle.textAlign === align}
                       className={`
-                        flex-1 py-1.5 flex justify-center rounded transition-all
+                        flex-1 py-2 flex justify-center rounded transition-all min-h-[36px]
                         ${state.textStyle.textAlign === align
                           ? 'bg-surface text-accent shadow-sm'
                           : 'text-ink-3 hover:text-ink'

@@ -66,7 +66,7 @@ export default function App() {
   /* ── No API key screen ── */
   if (hasKey === false) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-bg p-6">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-bg p-6">
         <div className="bg-accent/10 p-5 rounded-3xl mb-6">
           <Sticker className="w-12 h-12 text-accent" />
         </div>
@@ -86,7 +86,7 @@ export default function App() {
 
   /* ── Main app ── */
   return (
-    <div className="min-h-screen bg-bg text-ink font-sans selection:bg-accent/20">
+    <div className="min-h-dvh bg-bg text-ink font-sans selection:bg-accent/20">
 
       {/* ── Header ── */}
       <header
@@ -150,7 +150,8 @@ export default function App() {
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-semibold flex items-start gap-2"
+              role="alert"
+              className="mb-4 p-3 bg-error-bg border border-error-border text-error rounded-xl text-sm font-semibold flex items-start gap-2"
             >
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <p>{state.error}</p>
