@@ -1,24 +1,21 @@
-import { Settings, Sticker, AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, Sticker, AlertCircle, Download, Sun, Moon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 import { useAppState } from './hooks/useAppState';
+import { useTheme } from './hooks/useTheme';
 
-import { MobileNav } from './components/MobileNav';
-import { MiniPreview } from './components/MiniPreview';
-import { MobilePreviewTab } from './components/MobilePreviewTab';
-import { MobileGenerateTab } from './components/MobileGenerateTab';
-import { MobileStyleTab } from './components/MobileStyleTab';
-import { MobileExportTab } from './components/MobileExportTab';
-
-import { CanvasPanel } from './components/CanvasPanel';
-import { HistoryStrip } from './components/HistoryStrip';
-import { CharacterizeCard } from './components/CharacterizeCard';
-import { MoodCard } from './components/MoodCard';
-import { StyleCard } from './components/StyleCard';
-import { ExportCard } from './components/ExportCard';
-import { SettingsModal } from './components/SettingsModal';
-import { CropModal } from './components/CropModal';
-import { StepIndicator } from './components/StepIndicator';
+import { MobileNav }           from './components/MobileNav';
+import { CanvasPanel }          from './components/CanvasPanel';
+import { HistoryStrip }         from './components/HistoryStrip';
+import { CharacterizeCard }     from './components/CharacterizeCard';
+import { MoodCard }             from './components/MoodCard';
+import { StyleCard }            from './components/StyleCard';
+import { StickerTransformCard } from './components/StickerTransformCard';
+import { ExportModal }          from './components/ExportModal';
+import { SettingsModal }        from './components/SettingsModal';
+import { CropModal }            from './components/CropModal';
+import { StepIndicator }        from './components/StepIndicator';
 
 declare global {
   interface Window {
@@ -45,6 +42,9 @@ export default function App() {
     exportImage,
   } = useAppState();
 
+  const { theme, toggle: toggleTheme } = useTheme();
+  const [showExport, setShowExport] = useState(false);
+
   const setTab = (tab: typeof state.activeTab) =>
     setState((s: any) => ({ ...s, activeTab: tab }));
 
@@ -63,17 +63,20 @@ export default function App() {
     img.src = croppedDataUrl;
   };
 
+  /* ── No API key screen ── */
   if (hasKey === false) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 font-sans">
-        <Sticker className="w-20 h-20 text-indigo-600 mb-6" />
-        <h1 className="text-3xl font-black mb-3 text-slate-900">API Key Required</h1>
-        <p className="text-slate-600 mb-8 text-center max-w-md text-lg">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-bg p-6">
+        <div className="bg-accent/10 p-5 rounded-3xl mb-6">
+          <Sticker className="w-12 h-12 text-accent" />
+        </div>
+        <h1 className="text-3xl font-bold mb-3 text-ink">API Key Required</h1>
+        <p className="text-ink-2 mb-8 text-center max-w-md text-base leading-relaxed">
           Please select a Google Cloud project with billing enabled to use the Gemini Image models.
         </p>
         <button
           onClick={() => window.aistudio.openSelectKey()}
-          className="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:bg-indigo-700 hover:-translate-y-0.5 transition-all"
+          className="px-8 py-4 bg-accent hover:bg-accent-h text-white rounded-2xl font-semibold text-base transition-all active:scale-95"
         >
           Select API Key
         </button>
@@ -81,39 +84,73 @@ export default function App() {
     );
   }
 
+  /* ── Main app ── */
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans selection:bg-indigo-200">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200/60 px-4 sm:px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-xl shadow-md">
-            <Sticker className="w-5 h-5 text-white" />
+    <div className="min-h-screen bg-bg text-ink font-sans selection:bg-accent/20">
+
+      {/* ── Header ── */}
+      <header
+        className="bg-surface/90 backdrop-blur-md border-b border-border px-4 sm:px-6 py-3 flex justify-between items-center sticky top-0 z-50"
+        style={{ boxShadow: 'var(--c-shadow)' }}
+      >
+        <div className="flex items-center gap-2.5">
+          <div className="bg-accent p-2 rounded-xl">
+            <Sticker className="w-4 h-4 text-white" />
           </div>
-          <h1 className="text-xl font-black tracking-tight text-slate-900">StickerIt</h1>
+          <span className="text-lg font-bold tracking-tight text-ink">StickerIt</span>
         </div>
-        <button
-          onClick={() => setState((s: any) => ({ ...s, showSettings: true }))}
-          aria-label="Open settings"
-          className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors"
-        >
-          <Settings className="w-5 h-5 text-slate-700" />
-        </button>
+
+        <div className="flex items-center gap-1.5">
+          {/* Export */}
+          <button
+            onClick={() => setShowExport(true)}
+            disabled={!state.originalImage}
+            aria-label="Export sticker"
+            className="
+              flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold
+              bg-accent hover:bg-accent-h text-white
+              active:scale-95 transition-all
+              disabled:opacity-40 disabled:pointer-events-none
+            "
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Export</span>
+          </button>
+
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            className="p-2 rounded-xl hover:bg-surface-2 text-ink-3 hover:text-ink transition-colors"
+          >
+            {theme === 'dark'
+              ? <Sun className="w-5 h-5" />
+              : <Moon className="w-5 h-5" />
+            }
+          </button>
+
+          {/* Settings */}
+          <button
+            onClick={() => setState((s: any) => ({ ...s, showSettings: true }))}
+            aria-label="Open settings"
+            className="p-2 rounded-xl hover:bg-surface-2 text-ink-3 hover:text-ink transition-colors"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
-      {/* Floating mini-preview on non-Preview tabs (mobile only) */}
-      {state.activeTab !== 'preview' && state.originalImage && (
-        <MiniPreview canvasRef={canvasRef} onClick={() => setTab('preview')} />
-      )}
+      {/* ── Main content ── */}
+      <main className="max-w-[1400px] mx-auto p-4 pb-24 lg:pb-10">
 
-      <main className="max-w-[1400px] mx-auto p-4 pb-24 lg:pb-6">
         {/* Error banner */}
         <AnimatePresence>
           {state.error && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-bold flex items-start gap-2 shadow-sm"
+              exit={{ opacity: 0, y: -8 }}
+              className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-semibold flex items-start gap-2"
             >
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <p>{state.error}</p>
@@ -121,51 +158,23 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* ── Mobile: tab-based layout ── */}
-        <div className="lg:hidden space-y-4">
-          {state.activeTab === 'preview' && (
-            <MobilePreviewTab
-              state={state}
-              canvasRef={canvasRef}
-              onUploadClick={openFilePicker}
-              onDrop={handleDrop}
-              onLoadHistory={loadFromHistory}
-            />
-          )}
-          {state.activeTab === 'generate' && (
-            <MobileGenerateTab
-              state={state}
-              setState={setState}
-              onCharacterize={handleCharacterize}
-              onUploadClick={openFilePicker}
-              onApplyMood={handleStickerize}
-            />
-          )}
-          {state.activeTab === 'style' && (
-            <MobileStyleTab
-              state={state}
-              setState={setState}
-              onMagicIdeas={handleMagicIdeas}
-            />
-          )}
-          {state.activeTab === 'export' && (
-            <MobileExportTab
-              state={state}
-              setState={setState}
-              onExport={exportImage}
-            />
-          )}
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
 
-        {/* ── Desktop: two-column layout ── */}
-        <div className="hidden lg:grid lg:grid-cols-12 gap-4">
-          {/* Left: sticky canvas panel */}
+          {/* ── Left column: canvas + preview controls ── */}
           <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-20 h-fit">
+
+            {/* Step indicator (desktop only) */}
             <StepIndicator
               hasImage={!!state.originalImage}
               hasCharacter={!!state.characterBase64}
               hasCaption={!!state.caption}
             />
+
+            {/*
+              Canvas singleton — one element, always mounted.
+              Never use conditional rendering here; use CSS hide/show only.
+              This ensures canvasRef.current stays valid regardless of active tab.
+            */}
             <CanvasPanel
               canvasRef={canvasRef}
               originalImage={state.originalImage}
@@ -174,37 +183,73 @@ export default function App() {
               onUploadClick={openFilePicker}
               onDrop={handleDrop}
             />
-            <HistoryStrip
-              history={state.history}
-              currentImage={state.originalImage}
-              currentCharacter={state.characterBase64}
-              onLoad={loadFromHistory}
-            />
-            <CharacterizeCard
-              isProcessing={state.isProcessing}
-              hasImage={!!state.originalImage}
-              onCharacterize={handleCharacterize}
-              onUploadClick={openFilePicker}
-            />
-            <ExportCard
-              state={state}
-              setState={setState}
-              onExport={exportImage}
-            />
+
+            {/*
+              Preview tab extras:
+              - Mobile: visible only when activeTab === 'preview'
+              - Desktop: always visible (lg:block overrides hidden)
+            */}
+            <div className={`space-y-3 ${state.activeTab === 'preview' ? '' : 'hidden'} lg:block lg:space-y-4`}>
+              <StickerTransformCard
+                stickerStyle={state.stickerStyle}
+                setState={setState}
+              />
+              <HistoryStrip
+                history={state.history}
+                currentImage={state.originalImage}
+                currentCharacter={state.characterBase64}
+                onLoad={loadFromHistory}
+              />
+            </div>
+
+            {/* Characterize card — desktop only in left column */}
+            <div className="hidden lg:block">
+              <CharacterizeCard
+                isProcessing={state.isProcessing}
+                hasImage={!!state.originalImage}
+                onCharacterize={handleCharacterize}
+                onUploadClick={openFilePicker}
+              />
+            </div>
           </div>
 
-          {/* Right: controls */}
+          {/* ── Right column: control panels ── */}
           <div className="lg:col-span-7 space-y-4">
-            <MoodCard
-              state={state}
-              setState={setState}
-              onApplyMood={handleStickerize}
-            />
-            <StyleCard
-              state={state}
-              setState={setState}
-              onMagicIdeas={handleMagicIdeas}
-            />
+
+            {/*
+              Create tab:
+              - Mobile: visible only when activeTab === 'create'
+              - Desktop: always visible
+            */}
+            <div className={`space-y-4 ${state.activeTab === 'create' ? '' : 'hidden'} lg:block`}>
+              {/* CharacterizeCard: mobile only (desktop is in left column above) */}
+              <div className="lg:hidden">
+                <CharacterizeCard
+                  isProcessing={state.isProcessing}
+                  hasImage={!!state.originalImage}
+                  onCharacterize={handleCharacterize}
+                  onUploadClick={openFilePicker}
+                />
+              </div>
+              <MoodCard
+                state={state}
+                setState={setState}
+                onApplyMood={handleStickerize}
+              />
+            </div>
+
+            {/*
+              Style tab:
+              - Mobile: visible only when activeTab === 'style'
+              - Desktop: always visible
+            */}
+            <div className={`space-y-4 ${state.activeTab === 'style' ? '' : 'hidden'} lg:block`}>
+              <StyleCard
+                state={state}
+                setState={setState}
+                onMagicIdeas={handleMagicIdeas}
+              />
+            </div>
           </div>
         </div>
       </main>
@@ -216,6 +261,15 @@ export default function App() {
         onChange={handleFileUpload}
         accept="image/*, image/heic, image/heif"
         className="hidden"
+      />
+
+      {/* Export modal (header button → bottom sheet on mobile / centered on desktop) */}
+      <ExportModal
+        show={showExport}
+        state={state}
+        setState={setState}
+        onExport={exportImage}
+        onClose={() => setShowExport(false)}
       />
 
       {/* Crop modal */}
@@ -237,7 +291,7 @@ export default function App() {
         }
       />
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom tab bar */}
       <MobileNav activeTab={state.activeTab} onChange={setTab} />
     </div>
   );

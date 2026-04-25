@@ -53,32 +53,36 @@ export function CropModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden flex flex-col h-[80vh] shadow-2xl">
-        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-          <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-            <CropIcon className="w-5 h-5 text-indigo-600" />
+      <div
+        className="bg-surface rounded-2xl w-full max-w-2xl overflow-hidden flex flex-col h-[80vh] border border-border"
+        style={{ boxShadow: 'var(--c-shadow-lg)' }}
+      >
+        <div className="px-5 py-4 border-b border-border flex justify-between items-center bg-surface-2">
+          <h3 className="font-semibold text-base text-ink flex items-center gap-2">
+            <CropIcon className="w-4 h-4 text-accent" />
             Crop Image
           </h3>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 cursor-pointer text-sm font-bold text-slate-600">
+            <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-ink-2">
               <input
                 type="checkbox"
                 checked={cropAspect === 1}
                 onChange={(e) => setCropAspect(e.target.checked ? 1 : undefined)}
-                className="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                className="w-4 h-4 accent-[--c-accent] rounded"
               />
-              Lock 1:1 Ratio
+              Lock 1:1
             </label>
             <button
               onClick={onCancel}
               aria-label="Close crop"
-              className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+              className="p-1.5 hover:bg-surface-3 rounded-lg transition-colors text-ink-3 hover:text-ink"
             >
-              <X className="w-5 h-5 text-slate-500" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
-        <div className="relative flex-1 bg-slate-900 flex items-center justify-center overflow-auto p-4">
+
+        <div className="relative flex-1 bg-black/80 flex items-center justify-center overflow-auto p-4">
           <ReactCrop
             crop={crop}
             aspect={cropAspect}
@@ -101,16 +105,17 @@ export function CropModal({
             />
           </ReactCrop>
         </div>
-        <div className="p-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50">
+
+        <div className="px-5 py-4 border-t border-border bg-surface-2 flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-5 py-2.5 text-slate-600 font-bold hover:bg-slate-200 rounded-xl transition-colors"
+            className="px-4 py-2.5 text-sm font-semibold text-ink-2 hover:text-ink bg-surface-3 hover:bg-border rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleConfirm}
-            className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors"
+            className="px-5 py-2.5 bg-accent hover:bg-accent-h text-white font-semibold text-sm rounded-xl transition-all active:scale-95"
           >
             Confirm Crop
           </button>

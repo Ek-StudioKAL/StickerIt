@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { GoogleGenAI, Type, HarmCategory, HarmBlockThreshold } from '@google/genai';
 
-export type ActiveTab = 'preview' | 'generate' | 'style' | 'export';
+export type ActiveTab = 'preview' | 'create' | 'style';
 
 export interface TextStyle {
   fontSize: number;

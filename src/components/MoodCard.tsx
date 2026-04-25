@@ -11,55 +11,53 @@ export function MoodCard({
   setState: React.Dispatch<React.SetStateAction<any>>;
   onApplyMood: (mood: string) => void;
 }) {
-  const moodChipClass = (mood: string) =>
-    `px-3 py-2.5 border-2 rounded-lg text-xs font-bold transition-all min-h-[40px] ${
-      state.selectedMood === mood
-        ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-sm'
-        : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-white'
-    } disabled:opacity-50`;
-
   const disabled = state.isProcessing || !state.characterBase64;
+  const activeMood = state.selectedMood;
 
   return (
     <Card title="Adjust Mood" icon={Smile}>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {MOODS.map((mood) => (
+      <div className="flex flex-wrap gap-1.5 mb-4">
+        {[...MOODS, 'Custom'].map((mood) => (
           <button
             key={mood}
             onClick={() => setState((s: any) => ({ ...s, selectedMood: mood }))}
             disabled={disabled}
-            className={moodChipClass(mood)}
+            className={`
+              px-3 py-2 rounded-lg text-xs font-semibold border transition-all
+              min-h-[36px] disabled:opacity-40 disabled:pointer-events-none
+              ${activeMood === mood
+                ? 'bg-accent-subtle border-accent text-accent'
+                : 'bg-surface-2 border-border text-ink-2 hover:border-accent hover:text-accent hover:bg-accent-subtle'
+              }
+            `}
           >
             {mood}
           </button>
         ))}
-        <button
-          onClick={() => setState((s: any) => ({ ...s, selectedMood: 'Custom' }))}
-          disabled={disabled}
-          className={moodChipClass('Custom')}
-        >
-          Custom...
-        </button>
       </div>
 
-      {state.selectedMood === 'Custom' && (
+      {activeMood === 'Custom' && (
         <input
           type="text"
           value={state.customMood}
           onChange={(e) => setState((s: any) => ({ ...s, customMood: e.target.value }))}
-          placeholder="Enter custom mood..."
-          className="w-full p-3 mb-4 text-sm bg-slate-50 border-2 border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-medium transition-colors"
+          placeholder="Describe a mood…"
+          className="
+            w-full p-3 mb-4 text-sm bg-surface-2 border border-border rounded-xl
+            outline-none focus:border-accent focus:ring-2 focus:ring-accent/20
+            text-ink placeholder:text-ink-3 transition-colors
+          "
         />
       )}
 
       <button
-        onClick={() => onApplyMood(state.selectedMood === 'Custom' ? state.customMood : state.selectedMood)}
-        disabled={
-          disabled ||
-          !state.selectedMood ||
-          (state.selectedMood === 'Custom' && !state.customMood)
-        }
-        className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md hover:bg-indigo-700 active:scale-95 transition-all disabled:opacity-50 disabled:hover:bg-indigo-600 disabled:active:scale-100"
+        onClick={() => onApplyMood(activeMood === 'Custom' ? state.customMood : activeMood)}
+        disabled={disabled || !activeMood || (activeMood === 'Custom' && !state.customMood)}
+        className="
+          w-full py-3 bg-accent hover:bg-accent-h text-white rounded-xl
+          font-semibold text-sm transition-all active:scale-95
+          disabled:opacity-40 disabled:pointer-events-none
+        "
       >
         Apply Mood
       </button>
